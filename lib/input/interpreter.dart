@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:darth_agent/ability/ability.dart';
 import 'package:darth_agent/ability/basic/fallback.dart';
+import 'package:darth_agent/input/clients/input_client.dart';
 import 'package:darth_agent/utils/debug_type.dart';
-import 'package:ollama_dart/ollama.dart';
 
 import 'function_parser.dart';
 
@@ -12,7 +12,7 @@ import 'function_parser.dart';
 /// well when it works with opensource
 class Interpreter {
   const Interpreter({required this.client, required this.functionParser});
-  final Ollama client;
+  final InputClient client;
   final FunctionParser functionParser;
 
   Future<String> fetchFunctions({required String prompt, required List<Ability> abilities, required DebugType debug}) async {
@@ -38,7 +38,7 @@ class Interpreter {
       template: template,
       options: options,
     );
-    final response = functionResult.response;
+    final response = functionResult.choices.first.message.content;
     final functionCall = response.substring(response.indexOf('Call: ') + 6, debug == DebugType.verbose ? response.indexOf('Thought:') : response.length).trim();
     if (debug.index > 0)
       stdout.writeln(
