@@ -1,0 +1,39 @@
+name: darth_agent
+description: "A Dart package for adding an AI agent to your Flutter app."
+version: 0.0.1
+homepage:
+
+publish_to: none
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path: ^1.8.3
+  get_it: ^7.6.0
+  http: ^1.1.0
+  uuid: ^4.0.0
+  #mongo_dart: ^0.9.3 # Nosql data storage #ChromaDB needs 4.0.0 of uuid, mongo_dart needs 3.0.0
+  postgres: ^2.6.3 # Sql data storage. Note - 3.0.0 is a major rewrite
+  equatable: ^2.0.5
+
+  ollama_dart:
+    git:
+      url: https://github.com/brynjen/ollama_dart
+      ref: main
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.0
+  test: ^1.19.2
+#  very_good_analysis: ^5.1.0
+  lints: ^3.0.0
+  intl_utils: ^2.8.2
+
+flutter:
+  generate: true
+  uses-material-design: true
