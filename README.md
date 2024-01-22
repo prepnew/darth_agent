@@ -1,17 +1,22 @@
-# DARTH AGENT
-<table>
-  <tr>
-    <td style="border: none;">
-      <a href="darth_agent.png">
-        <img src="darth_agent_logo.png" alt="Logo" width="100" />
-      </a>
-    </td>
-    <td style="border: none;">
-      Open source package for AI agents using Dart<br>
-      Combines MemGPT and AutoGen to try to create a general purpose agent<br>
-      Works (in the future) with Ollama and ChatGPT, but for now just Ollama locally
-    </td>
-  </tr>
-</table>
-Idea of this is to either be used serverside with dart_frog or serverpod and access local instances of Ollama, or use local models 
-through device like modern android (or ofc slower devices) depending on memory and speed.
+# Darth Agent
+
+[![Darth Agent](darth_agent_logo.png)](dart_agent.png)
+
+## Introduction
+`darth_agent` is a versatile Dart package designed for seamless integration into Dart or Flutter projects, be it on the backend, web or in mobile applications. This package serves as a foundation for building AI agents, leveraging model interfaces like Ollama and ChatGPT. Developers can customize and extend these agents with specific abilities, personalities, and memory functionalities tailored to their project's needs.
+
+## Features
+
+- **Generic AI Interface**: Easy interaction with AI models like Ollama and ChatGPT. (For now only towards Ollama)
+- **Customizable Abilities**: Framework to implement project-specific functions for external data retrieval and processing.
+- **Advanced Memory Systems**: Incorporates Retrieval Augmented Generation using ChromaDb for context-rich and intelligent responses.
+
+## Installation
+This is not published to pub.dev yet and is far from a working example.
+
+To include `darth_agent` in your project, add the following to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  darth_agent: ^latest_version
+```
