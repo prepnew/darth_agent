@@ -1,4 +1,4 @@
-import 'package:darth_agent/abilities/ability.dart';
+import 'package:darth_agent/ability/ability.dart';
 
 /// Should be part of every agent if it should function as an agent that is able
 /// to NOT use abilities. If NO other abilities matches the user input, this

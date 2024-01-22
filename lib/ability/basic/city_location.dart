@@ -1,4 +1,4 @@
-import 'package:darth_agent/abilities/ability.dart';
+import 'package:darth_agent/ability/ability.dart';
 
 /// Finds a city's coordinates using the Maps.co Geocoding API using its name
 class CityLocation extends Ability {

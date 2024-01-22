@@ -1,4 +1,4 @@
-import 'package:darth_agent/abilities/ability.dart';
+import 'package:darth_agent/ability/ability.dart';
 
 /// Accesses the weather API to check the weather at a given location
 class WeatherCheck extends Ability {

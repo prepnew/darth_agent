@@ -1,13 +1,14 @@
 library darth_agent;
 
 import 'package:darth_agent/input/interpreter.dart';
+import 'package:darth_agent/utils/debug_type.dart';
 
-import 'abilities/ability.dart';
+import 'ability/ability.dart';
 import 'memory/memory.dart';
 import 'memory/subject.dart';
-import 'personalities/personality.dart';
-import 'responses/agent_message.dart';
-import 'responses/agent_response.dart';
+import 'personality/personality.dart';
+import 'response/agent_message.dart';
+import 'response/agent_response.dart';
 
 /// Represents a complete AI agent, with abilities, memory and personality
 class AIAgent {
@@ -31,6 +32,9 @@ class AIAgent {
 
     /// Optional personality for a more human-like agent
     this.personality,
+
+    /// Whether to print debug information or not
+    this.debug = DebugType.none,
   });
 
   final Interpreter interpreter;
@@ -39,10 +43,12 @@ class AIAgent {
   final Memory coreMemory;
   final Memory archivalMemory;
   final Personality? personality;
+  final DebugType debug;
 
   /// Returns a completed response from the Agent
   Future<AgentResponse> requestResponse({required String prompt}) async {
-    return Future.value(AgentResponse(message: 'test', tokens: 0));
+    final functionCallResponse = await interpreter.fetchFunctions(prompt: prompt, abilities: abilities, debug: debug);
+    return Future.value(AgentResponse(message: functionCallResponse, tokens: 0));
   }
 
   /// Returns each intermediate response from the Agent, meaning every step and
@@ -51,7 +57,7 @@ class AIAgent {
     // Fetch all functions from abilities and memories
     //functions.add(coreMemory.functionsDescription);
     //functions.add(archivalMemory.functionsDescription);
-    final functionCallResponse = await interpreter.fetchFunctions(prompt: prompt, abilities: abilities);
+    final functionCallResponse = await interpreter.fetchFunctions(prompt: prompt, abilities: abilities, debug: debug);
     return Stream.fromIterable([
       AgentMessage(message: functionCallResponse),
     ]);
