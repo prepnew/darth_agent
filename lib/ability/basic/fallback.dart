@@ -7,7 +7,7 @@ import 'package:darth_agent/ability/ability.dart';
 /// llm to not choose an invalid ability in vain
 class FallBack extends Ability {
   @override
-  Future<String> functionCall(List args) async {
+  Future<String> functionCall(Map args) async {
     return '';
   }
 

@@ -4,8 +4,8 @@ import 'package:darth_agent/ability/basic/city_location.dart';
 import 'package:darth_agent/ability/basic/weather_check.dart';
 import 'package:darth_agent/ai_agent.dart';
 import 'package:darth_agent/input/clients/ollama_client.dart';
-import 'package:darth_agent/input/function_parser.dart';
 import 'package:darth_agent/input/interpreter.dart';
+import 'package:darth_agent/input/python_ability_parser.dart';
 import 'package:darth_agent/memory/long_term/archival_memory.dart';
 import 'package:darth_agent/memory/short_term/core_memory.dart';
 import 'package:darth_agent/utils/debug_type.dart';
@@ -20,9 +20,9 @@ void main() async {
     archivalMemory: ArchivalMemory(),
     interpreter: Interpreter(
       client: OllamaClient(host: 'http://localhost'),
-      functionParser: FunctionParser(),
+      functionParser: PythonAbilityParser(),
     ),
-    debug: DebugType.none,
+    debug: DebugType.basic,
   );
 
   final response = await aiAgent.requestResponse(prompt: prompt);

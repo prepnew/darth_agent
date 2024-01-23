@@ -1,12 +1,23 @@
+import 'dart:io';
+
 import 'package:darth_agent/ability/ability.dart';
+import 'package:darth_agent/input/ability_parser.dart';
 
 /// Accesses the weather API to check the weather at a given location
 class WeatherCheck extends Ability {
   WeatherCheck();
 
   @override
-  Future<String> functionCall(List<Map<String, dynamic>> args) async {
-    return 'Weather is terrible: $args';
+  Future<String> functionCall(Map<String, dynamic> args) async {
+    final coordinates = args['coordinates'];
+    if (coordinates is AbilityCall) {
+      stdout.writeln('Weather calling function: ${coordinates.ability.functionName} with arguments: ${coordinates.arguments}');
+      final ability = coordinates.ability;
+      final result = await ability.functionCall(coordinates.arguments);
+      return 'Weather result from ${ability.functionName}: $result';
+    } else {
+      return 'Weather is terrible at: $coordinates';
+    }
   }
 
   @override

@@ -1,15 +1,19 @@
+import 'package:darth_agent/ability/ability.dart';
+import 'package:darth_agent/input/ability_parser.dart';
+
 final functionAndArgumentsRegex = RegExp(r'(\w+)\(((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)');
 final argsPattern = RegExp(r'(\w+)=(\[[^\]]+\]|\([^\)]+\)|[^,]+)');
 
 /// Takes in a string that is basically a python function call with named arguments
 /// and converts it into a list of maps with the function name and arguments.
 /// The list handles each function call in the string in order.
-class FunctionParser {
+class PythonAbilityParser extends AbilityParser {
   // Parse a single or multiline function call string
-  List<Map<String, dynamic>> parseFunctionCalls(String input) {
-    var functions = <Map<String, dynamic>>[];
+  @override
+  List<AbilityCall> parseFunctionCalls(String functionCall, List<Ability> abilities) {
+    final functions = <AbilityCall>[];
     // First, split the string into lines
-    var lines = input.split('\n');
+    var lines = functionCall.split('\n');
     for (final line in lines) {
       // Then, assume each line is a single function call (that might have nested function calls).
       // Also assume that each function call has named arguments. Also, each
@@ -24,10 +28,8 @@ class FunctionParser {
       // First, generate a regEx that finds the function name and groups each argument consolidated with = between them. Comma if there are multiple arguments
 
       for (final match in functionAndArgumentsRegex.allMatches(line)) {
-        final functionName = match.group(1)!;
-        final argumentValue = match.group(2)!;
-        final arguments = _parseArguments(argumentValue);
-        functions.add({'function': functionName, 'arguments': arguments});
+        final arguments = _parseArguments(match.group(2)!, abilities);
+        functions.add(AbilityCall(ability: abilities.firstWhere((x) => x.functionName == match.group(1)!), arguments: arguments));
       }
     }
 
@@ -35,7 +37,8 @@ class FunctionParser {
   }
 
   // Parse arguments of a function
-  dynamic _parseArguments(String argsString) {
+  Map<String, dynamic> _parseArguments(String argsString, List<Ability> abilities) {
+    if (argsString.isEmpty) return {};
     var argsMap = <String, dynamic>{};
 
     // Split the argument string into matching key-values
@@ -57,14 +60,16 @@ class FunctionParser {
         argsMap[key] = double.parse(value);
       } else if (nestedFunctionMatches.isNotEmpty) {
         for (final functionMatch in nestedFunctionMatches) {
-          final arguments = _parseArguments(functionMatch.group(2)!);
-          argsMap[key] = {'function': functionMatch.group(1), 'arguments': arguments};
+          final functionName = functionMatch.group(1)!;
+          final functionArguments = functionMatch.group(2)!;
+          final arguments = _parseArguments(functionArguments, abilities);
+          argsMap[key] = AbilityCall(ability: abilities.firstWhere((x) => x.functionName == functionName), arguments: arguments);
         }
       }
     }
     if (argsMap.isEmpty) {
-      return [];
+      return {};
     }
-    return [argsMap];
+    return argsMap;
   }
 }
