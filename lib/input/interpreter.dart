@@ -36,26 +36,24 @@ class Interpreter {
     if (debug != DebugType.verbose) {
       options['stop'] = ['Thought:'];
     }
-
-    final functionResult = await client.generateResult(
-      prompt: prompt,
+    client.setupGeneration(
       model: 'nexusraven',
       systemPrompt: systemPrompt,
       template: template,
       options: options,
     );
+    final functionResult = await client.generateResult(prompt: prompt);
     final response = functionResult.choices.first.message.content;
     final functionCall = response.substring(response.indexOf('Call: ') + 6, debug == DebugType.verbose ? response.indexOf('Thought:') : response.length).trim();
     if (debug.index > 0)
       stdout.writeln(
           'Function call:${debug == DebugType.verbose ? response : functionCall}\nFunction call used ${DateTime.now().millisecondsSinceEpoch - time} milliseconds to complete');
     final parsedFunctions = functionParser.parseFunctionCalls(functionCall, abilities);
-    for (final func in parsedFunctions) {
-      final ability = func.ability;
-      stdout.writeln('Calling function: ${ability.functionName} with arguments: ${func.arguments}');
-      final result = await ability.functionCall(func.arguments);
-      stdout.writeln('Result from ${ability.functionName}: $result');
+    final functionResponses = <String>[];
+    for (final function in parsedFunctions) {
+      final result = await function.ability.call(function.arguments);
+      functionResponses.add(result);
     }
-    return functionCall;
+    return functionResponses.join('\n');
   }
 }

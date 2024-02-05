@@ -24,7 +24,11 @@ dependencies:
     git:
       url: https://github.com/brynjen/ollama_dart
       ref: main
-
+  llama_cpp_dart:
+    git:
+      url: ./llama_cpp_dart
+      ref: main
+      
 dev_dependencies:
   flutter_test:
     sdk: flutter

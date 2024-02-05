@@ -10,6 +10,7 @@
 - **Generic AI Interface**: Easy interaction with AI models like Ollama and ChatGPT. (For now only towards Ollama)
 - **Customizable Abilities**: Framework to implement project-specific functions for external data retrieval and processing.
 - **Advanced Memory Systems**: Incorporates Retrieval Augmented Generation using ChromaDb for context-rich and intelligent responses.
+- **Direct connection to device**: Edge device support, run on mobile devices directly with llama.cpp port (not correctly integrated yet)
 
 ## Installation
 This is not published to pub.dev yet and is far from a working example.

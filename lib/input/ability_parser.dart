@@ -12,4 +12,9 @@ class AbilityCall {
   AbilityCall({required this.ability, required this.arguments});
   final Ability ability;
   final Map<String, dynamic> arguments;
+
+  @override
+  String toString() {
+    return 'AbilityCall==>${ability.functionName}($arguments)';
+  }
 }

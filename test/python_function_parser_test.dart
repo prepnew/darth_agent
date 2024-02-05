@@ -101,7 +101,7 @@ get_awesome_llm(coordinates=(17.12, 18.12))''', _abilities);
 
 class _FakeWeatherAbility extends Ability {
   @override
-  Future<String> functionCall(Map<String, dynamic> args) => Future.value('');
+  Future<String> call(Map<String, dynamic> args, {bool llmOutput = true}) => Future.value('');
   @override
   String get functionName => 'get_weather_data';
   @override
@@ -110,7 +110,7 @@ class _FakeWeatherAbility extends Ability {
 
 class _FakeGetCity extends Ability {
   @override
-  Future<String> functionCall(Map<String, dynamic> args) => Future.value('');
+  Future<String> call(Map<String, dynamic> args, {bool llmOutput = true}) => Future.value('');
   @override
   String get functionName => 'get_city_coordinates';
   @override
@@ -119,7 +119,7 @@ class _FakeGetCity extends Ability {
 
 class _FakeReview extends Ability {
   @override
-  Future<String> functionCall(Map<String, dynamic> args) => Future.value('');
+  Future<String> call(Map<String, dynamic> args, {bool llmOutput = true}) => Future.value('');
   @override
   String get functionName => 'get_review_score';
   @override
@@ -128,7 +128,7 @@ class _FakeReview extends Ability {
 
 class _FakeAwesome extends Ability {
   @override
-  Future<String> functionCall(Map<String, dynamic> args) => Future.value('');
+  Future<String> call(Map<String, dynamic> args, {bool llmOutput = true}) => Future.value('');
   @override
   String get functionName => 'get_awesome_llm';
   @override
@@ -137,7 +137,7 @@ class _FakeAwesome extends Ability {
 
 class _FakeAltitude extends Ability {
   @override
-  Future<String> functionCall(Map<String, dynamic> args) => Future.value('');
+  Future<String> call(Map<String, dynamic> args, {bool llmOutput = true}) => Future.value('');
   @override
   String get functionName => 'get_altitude';
   @override

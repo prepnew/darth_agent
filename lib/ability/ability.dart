@@ -13,5 +13,5 @@ abstract class Ability {
 
   /// Function call used by LLM, can be any type and any number of arguments
   /// Arguments come in json format. Check function_parser.dart for more info
-  Future<String> functionCall(Map<String, dynamic> args);
+  Future<dynamic> call(Map<String, dynamic> args, {bool llmOutput = true});
 }

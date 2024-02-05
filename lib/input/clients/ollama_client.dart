@@ -19,33 +19,27 @@ class OllamaClient extends InputClient {
   @override
   Future<ClientResult> generateResult({
     required String prompt,
-    required String model,
-    required String systemPrompt,
-    required String template,
-    required Map<String, dynamic> options,
-    Map<String, dynamic>? headers,
   }) async {
     final result = await ollama.generateResult(
       prompt: prompt,
-      model: model,
+      model: model!,
       systemPrompt: systemPrompt,
       template: template,
       options: options,
     );
-    return result.toClientResult(model);
+    return result.toClientResult(model!);
   }
 
   @override
   Future<Stream<ClientChunkResult>> streamResult({
     required String prompt,
-    required String model,
-    required String systemPrompt,
-    required String template,
-    required Map<String, dynamic> options,
-    Map<String, dynamic>? headers,
   }) async {
-    final stream = await ollama.generateStream(prompt: prompt, model: model);
-    return stream.map((chunk) => chunk.toClientChunkResult(model));
+    final stream = await ollama.generateStream(
+      prompt: prompt,
+      model: model!,
+      systemPrompt: systemPrompt,
+    );
+    return stream.map((chunk) => chunk.toClientChunkResult(model!));
   }
 }
 
