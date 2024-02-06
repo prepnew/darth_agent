@@ -14,7 +14,9 @@ import 'package:darth_agent/input/python_skill_parser.dart';
 import 'package:darth_agent/utils/debug_type.dart';
 import 'package:langchain_chroma/langchain_chroma.dart';
 
-const prompt = 'Tell me what I like to eat on fridays'; //'What is the temperature in Oslo right now?';
+// TODO: Rework ContextExpander to use a different model, nexusraven is not good enough
+// It could give funny results thinking friday was a place, attempting to find weather in it with no reference to weather in prompt
+const prompt = 'What is the temperature in Oslo right now?';
 
 void main() async {
   final ollamaClient = OllamaClient(host: 'http://localhost');
@@ -24,13 +26,18 @@ void main() async {
       WeatherCheck(userAgent: Env.weatherUserAgent, dataStore: PostgresqlDb()),
       LocationCheck(locationApiKey: Env.locationApiKey, dataStore: PostgresqlDb()),
     ],
-    memories: [ChromaConversationMemory(chromaDataStore: ChromaDataStore(chromaClient: Chroma(embeddings: OllamaEmbeddings(client: ollamaClient))))],
-    subjects: [],
+    memories: [
+      ChromaConversationMemory(
+          chromaDataStore: ChromaDataStore(
+              chromaClient: Chroma(
+        embeddings: OllamaEmbeddings(client: ollamaClient),
+      )))
+    ],
     contextRetriever: ContextExpander(
       client: ollamaClient,
       skillParser: PythonSkillParser(),
     ),
-    debug: DebugType.basic,
+    debug: DebugType.none,
   );
 
   final response = await aiAgent.requestResponse(prompt: prompt);

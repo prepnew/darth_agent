@@ -1,7 +1,7 @@
 import 'package:darth_agent/memory/interactors/archival_memory_insert.dart';
 import 'package:darth_agent/memory/interactors/archival_memory_search.dart';
-import 'package:darth_agent/memory/interactors/core_append_memory.dart';
-import 'package:darth_agent/memory/interactors/core_replace_memory.dart';
+import 'package:darth_agent/memory/interactors/core_memory_append.dart';
+import 'package:darth_agent/memory/interactors/core_memory_replace.dart';
 import 'package:darth_agent/memory/memory_bank.dart';
 import 'package:darth_agent/memory/util/chroma_datastore.dart';
 
@@ -11,8 +11,8 @@ class ChromaConversationMemory extends MemoryBank {
     required ChromaDataStore chromaDataStore,
   }) : super(
           memoryInteractors: [
-            CoreAppendMemory(),
-            CoreReplaceMemory(),
+            CoreMemoryAppend(),
+            CoreMemoryReplace(),
             ArchivalMemoryInsert(),
             ArchivalMemorySearch(),
           ],

@@ -33,7 +33,8 @@ class ContextExpander {
     // TODO: Template is specific for nexusraven. Need a similar template for ChatGPT
     final template = '''{{ .System }}\nUser Query: {{ .Prompt }}<human_end>''';
     // TODO: Fallback function is not model agnostic and bound to PythonParser for NexusRaven. Need a similar function for ChatGPT
-    skills.add(FallBack());
+    final fallbackSkill = FallBack();
+    skills.add(fallbackSkill);
 
     // Adding all skill descriptions to system prompt
     // TODO: This is also not model agnostic and will not work for ChatGPT
@@ -41,6 +42,7 @@ class ContextExpander {
     for (final skill in skills) {
       systemPrompt += skill.description;
     }
+    if (debug.index > 1) stdout.writeln('System prompt skills: $systemPrompt');
 
     // Low temperature to have no deviation
     final options = <String, dynamic>{
@@ -60,12 +62,17 @@ class ContextExpander {
     /// then move on to memories and subjects
     final functionResult = await client.generateResult(prompt: prompt);
     final response = functionResult.choices.first.message.content;
+    stdout.writeln('Function call result: $response');
     final skillCheck = response.substring(response.indexOf('Call: ') + 6, debug == DebugType.verbose ? response.indexOf('Thought:') : response.length).trim();
     if (debug.index > 0)
       stdout.writeln(
           'Skill check:${debug == DebugType.verbose ? response : skillCheck}\nSkill used ${DateTime.now().millisecondsSinceEpoch - time} milliseconds to complete');
-    for (final parsed in skillParser.parseSkills(skillCheck, skills)) {
-      context.add(await parsed.skill.use(parsed.arguments, debug: debug));
+
+    /// No skills are used if fallback is activated
+    if (!skillCheck.startsWith(fallbackSkill.name)) {
+      for (final parsed in skillParser.parseSkills(skillCheck, skills)) {
+        context.add(await parsed.skill.use(parsed.arguments, debug: debug));
+      }
     }
 
     /// Finding memories or manipulates memory based on prompt
@@ -74,7 +81,7 @@ class ContextExpander {
       for (final neurolink in memoryBank.memoryInteractors) {
         systemPrompt += neurolink.description;
       }
-      stdout.writeln('Memory system prompt: $systemPrompt');
+      if (debug.index > 1) stdout.writeln('Memory system prompt: $systemPrompt');
       client.setupGeneration(
         model: 'nexusraven',
         systemPrompt: systemPrompt,
@@ -85,7 +92,8 @@ class ContextExpander {
       /// Memory interaction decided
       final memoryResult = await client.generateResult(prompt: prompt);
       final memoryResponse = memoryResult.choices.first.message.content;
-      stdout.writeln('Memory result: $memoryResponse');
+      stdout.writeln('Memory function: $memoryResponse');
+      // TODO: Rework skill parser to also work for memories? Or a separate one?
     }
 
     return context.join('\n');

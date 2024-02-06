@@ -1,5 +1,5 @@
 name: darth_agent
-description: "A Dart package for adding an AI agent to your Flutter app."
+description: "A Dart package for adding an AI agent to your Dart or Flutter app."
 version: 0.0.1
 homepage:
 
@@ -14,10 +14,10 @@ dependencies:
     sdk: flutter
   path: ^1.8.3
   get_it: ^7.6.0
-  http: ^1.1.0
+  #http: ^1.1.0
   uuid: ^4.0.0
   #mongo_dart: ^0.9.3 # Nosql data storage #ChromaDB needs 4.0.0 of uuid, mongo_dart needs 3.0.0
-  postgres: ^2.6.3 # Sql data storage. Note - 3.0.0 is a major rewrite
+  #postgres: ^2.6.3 # Sql data storage. Note - 3.0.0 is a major rewrite
   equatable: ^2.0.5
 
   # LangChain dependencies

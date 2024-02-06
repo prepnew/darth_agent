@@ -15,7 +15,8 @@ class FallBack extends Skill {
 Function:
 def $name():
 """
-No other matching function wwas found. This function is used if no match is available.
+The other functions are not viable or is a bad match for prompt. This function
+should be called when match is bad.
 
 No arguments.
 

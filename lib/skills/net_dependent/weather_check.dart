@@ -21,6 +21,8 @@ Function:
 def $name(coordinates: tuple):
 """
 Fetches weather data from the Open-Meteo API for the given latitude and longitude.
+Use this function if user wants weather data. If prompt contain other than a request
+for weather this function is invalid.
 If missing coordinates then this method is invalid or must be found with another method.
 
 - coordinates (tuple): The latitude and longitude of the location to fetch weather for. Does not support array of coordinates.

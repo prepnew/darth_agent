@@ -21,6 +21,7 @@ Function:
 def $name(location: str):
 """
 Fetches the coordinates (latitude and longitude) of a given address or city name using the MapBox Geocoding API.
+This function should only be used if prompt needs coordinates for a location.
 
 - location (str): The name of the location.
 

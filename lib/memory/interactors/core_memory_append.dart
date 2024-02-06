@@ -3,7 +3,7 @@ import 'package:darth_agent/memory/util/embeddings_datastore.dart';
 import 'package:darth_agent/utils/debug_type.dart';
 
 /// Memory bound to user info and interactions. Used as short term memory
-class CoreAppendMemory extends NeuroLink {
+class CoreMemoryAppend extends NeuroLink {
   @override
   String get name => 'core_memory_append';
 

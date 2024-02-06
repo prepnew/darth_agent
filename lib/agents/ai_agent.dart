@@ -15,9 +15,9 @@ class AIAgent {
   AIAgent({
     required this.name,
     required this.contextRetriever,
-    required this.skills,
-    required this.subjects,
-    required this.memories,
+    this.skills = const [],
+    this.subjects = const [],
+    this.memories = const [],
     this.personality,
     this.debug = DebugType.none,
   });

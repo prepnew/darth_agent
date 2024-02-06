@@ -2,7 +2,7 @@ import 'package:darth_agent/memory/neuro_link.dart';
 import 'package:darth_agent/memory/util/embeddings_datastore.dart';
 import 'package:darth_agent/utils/debug_type.dart';
 
-class CoreReplaceMemory extends NeuroLink {
+class CoreMemoryReplace extends NeuroLink {
   @override
   String get name => 'core_memory_replace';
 
