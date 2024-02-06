@@ -31,4 +31,10 @@ class ChatGPTClient extends InputClient {
   void dispose() {
     // TODO: implement dispose
   }
+
+  @override
+  Future<List<double>> generateEmbeddings({required String prompt}) {
+    // TODO: implement generateEmbeddings
+    throw UnimplementedError();
+  }
 }

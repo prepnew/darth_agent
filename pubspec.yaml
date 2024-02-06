@@ -20,6 +20,10 @@ dependencies:
   postgres: ^2.6.3 # Sql data storage. Note - 3.0.0 is a major rewrite
   equatable: ^2.0.5
 
+  # LangChain dependencies
+  langchain: ^0.4.1
+  langchain_chroma: ^0.1.0+15
+
   ollama_dart:
     git:
       url: https://github.com/brynjen/ollama_dart

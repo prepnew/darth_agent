@@ -35,5 +35,7 @@ abstract class InputClient {
 
   Future<Stream<ClientChunkResult>> streamResult({required String prompt});
 
+  Future<List<double>> generateEmbeddings({required String prompt});
+
   void dispose() {}
 }

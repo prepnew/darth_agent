@@ -41,6 +41,17 @@ class OllamaClient extends InputClient {
     );
     return stream.map((chunk) => chunk.toClientChunkResult(model!));
   }
+
+  @override
+  Future<List<double>> generateEmbeddings({required String prompt}) async {
+    // TODO: Add options properly
+    final ollamaEmdeddings = await ollama.generateEmbeddings(
+      model!,
+      prompt,
+      options: null,
+    );
+    return ollamaEmdeddings.embeddings;
+  }
 }
 
 extension _OllamaResultExtension on Result {

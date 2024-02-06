@@ -1,20 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:darth_agent/ability/ability.dart';
-import 'package:darth_agent/input/ability_parser.dart';
+import 'package:darth_agent/memory/util/datastore.dart';
+import 'package:darth_agent/skills/skill.dart';
+import 'package:darth_agent/input/skill_parser.dart';
+import 'package:darth_agent/utils/debug_type.dart';
 import 'package:http/http.dart' as http;
 
 /// Accesses the weather API to check the weather at a given location
 /// Use https://api.met.no/doc/ForecastJSON to add more to the resulting data
-class WeatherCheck extends Ability {
-  WeatherCheck({required this.userAgent});
+class WeatherCheck extends Skill {
+  WeatherCheck({required this.userAgent, this.dataStore});
 
-  final String userAgent;
   @override
-  String get functionsDescription => '''
+  String get name => 'get_weather_data';
+
+  @override
+  String get description => '''
 Function:
-def $functionName(coordinates: tuple):
+def $name(coordinates: tuple):
 """
 Fetches weather data from the Open-Meteo API for the given latitude and longitude.
 If missing coordinates then this method is invalid or must be found with another method.
@@ -25,21 +29,21 @@ Returns: float: The current temperature in the coordinates you've asked for
 """
 ''';
 
-  @override
-  String get functionName => 'get_weather_data';
+  final String userAgent;
+  final DataStore? dataStore;
 
   @override
-  Future call(Map<String, dynamic> args, {bool llmOutput = true}) async {
+  Future use(Map<String, dynamic> args, {bool llmOutput = true, DebugType debug = DebugType.none}) async {
     final coordinates = args['coordinates'];
-    if (coordinates is AbilityCall) {
+    if (coordinates is SkillUse) {
       final location = coordinates.arguments['location'];
-      //stdout.writeln('Weather calling function: ${coordinates.ability.functionName} for coordinates with location: $location');
-      final ability = coordinates.ability;
-      final coordResult = await ability.call(coordinates.arguments, llmOutput: false) as List<double>?;
+      if (debug.index > 1) stdout.writeln('Weather calling function: ${coordinates.skill.name} for coordinates with location: $location');
+      final ability = coordinates.skill;
+      final coordResult = await ability.use(coordinates.arguments, llmOutput: false) as List<double>?;
       if (coordResult != null) {
         final lat = coordResult[1];
         final lng = coordResult[0];
-        stdout.writeln('Finding weather for $location at $lat, $lng');
+        if (debug.index > 0) stdout.writeln('Finding weather for $location at $lat, $lng');
         final weatherResponse = await http.get(
           Uri.parse('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$lat&lon=$lng'),
           headers: {'Accept': 'application/json', 'User-Agent': userAgent},
@@ -52,7 +56,7 @@ Returns: float: The current temperature in the coordinates you've asked for
             return null;
           }
         } else {
-          final output = WeatherResponse.fromJson(json);
+          final output = _WeatherResponse.fromJson(json);
           if (llmOutput) {
             return 'The temperature at $location is ${output.properties.timeSeries[0].data.instant.details.airTemperature} degrees ${output.properties.meta.units.airTemperature}';
           } else {
@@ -72,77 +76,77 @@ Returns: float: The current temperature in the coordinates you've asked for
   }
 }
 
-class WeatherResponse {
-  WeatherResponse({required this.properties});
-  final Properties properties;
+class _WeatherResponse {
+  _WeatherResponse({required this.properties});
+  final _Properties properties;
 
-  factory WeatherResponse.fromJson(Map<String, dynamic> json) {
-    return WeatherResponse(
-      properties: Properties.fromJson(json['properties']),
+  factory _WeatherResponse.fromJson(Map<String, dynamic> json) {
+    return _WeatherResponse(
+      properties: _Properties.fromJson(json['properties']),
     );
   }
 }
 
-class Properties {
-  Properties({required this.meta, required this.timeSeries});
-  final Meta meta;
-  final List<TimeSeries> timeSeries;
+class _Properties {
+  _Properties({required this.meta, required this.timeSeries});
+  final _Meta meta;
+  final List<_TimeSeries> timeSeries;
 
-  factory Properties.fromJson(Map<String, dynamic> json) {
-    return Properties(
-      meta: Meta.fromJson(json['meta']),
-      timeSeries: (json['timeseries'] as List<dynamic>).map((e) => TimeSeries.fromJson(e)).toList(growable: false),
+  factory _Properties.fromJson(Map<String, dynamic> json) {
+    return _Properties(
+      meta: _Meta.fromJson(json['meta']),
+      timeSeries: (json['timeseries'] as List<dynamic>).map((e) => _TimeSeries.fromJson(e)).toList(growable: false),
     );
   }
 }
 
-class Meta {
-  Meta({required this.units});
-  final Units units;
-  factory Meta.fromJson(Map<String, dynamic> json) {
-    return Meta(units: Units.fromJson(json['units']));
+class _Meta {
+  _Meta({required this.units});
+  final _Units units;
+  factory _Meta.fromJson(Map<String, dynamic> json) {
+    return _Meta(units: _Units.fromJson(json['units']));
   }
 }
 
-class Units {
-  Units({required this.airTemperature});
+class _Units {
+  _Units({required this.airTemperature});
   final String airTemperature;
-  factory Units.fromJson(Map<String, dynamic> json) {
-    return Units(airTemperature: json['air_temperature']);
+  factory _Units.fromJson(Map<String, dynamic> json) {
+    return _Units(airTemperature: json['air_temperature']);
   }
 }
 
-class TimeSeries {
-  TimeSeries({required this.data});
-  final Data data;
-  factory TimeSeries.fromJson(Map<String, dynamic> json) {
-    return TimeSeries(data: Data.fromJson(json['data']));
+class _TimeSeries {
+  _TimeSeries({required this.data});
+  final _Data data;
+  factory _TimeSeries.fromJson(Map<String, dynamic> json) {
+    return _TimeSeries(data: _Data.fromJson(json['data']));
   }
 }
 
-class Data {
-  Data({required this.instant});
-  final Instant instant;
-  factory Data.fromJson(Map<String, dynamic> json) {
-    return Data(instant: Instant.fromJson(json['instant']));
+class _Data {
+  _Data({required this.instant});
+  final _Instant instant;
+  factory _Data.fromJson(Map<String, dynamic> json) {
+    return _Data(instant: _Instant.fromJson(json['instant']));
   }
 }
 
-class Instant {
-  Instant({required this.details});
-  final Details details;
+class _Instant {
+  _Instant({required this.details});
+  final _Details details;
 
-  factory Instant.fromJson(Map<String, dynamic> json) {
-    return Instant(details: Details.fromJson(json['details']));
+  factory _Instant.fromJson(Map<String, dynamic> json) {
+    return _Instant(details: _Details.fromJson(json['details']));
   }
 }
 
-class Details {
-  Details({required this.airTemperature});
+class _Details {
+  _Details({required this.airTemperature});
   final double airTemperature;
 
-  factory Details.fromJson(Map<String, dynamic> json) {
-    return Details(airTemperature: json['air_temperature']);
+  factory _Details.fromJson(Map<String, dynamic> json) {
+    return _Details(airTemperature: json['air_temperature']);
   }
 }
 

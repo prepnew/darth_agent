@@ -1,5 +1,5 @@
-import 'package:darth_agent/ability/ability.dart';
-import 'package:darth_agent/input/ability_parser.dart';
+import 'package:darth_agent/skills/skill.dart';
+import 'package:darth_agent/input/skill_parser.dart';
 
 final functionAndArgumentsRegex = RegExp(r'(\w+)\(((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)');
 final argsPattern = RegExp(r'(\w+)=(\[[^\]]+\]|\([^\)]+\)|[^,]+)');
@@ -7,11 +7,11 @@ final argsPattern = RegExp(r'(\w+)=(\[[^\]]+\]|\([^\)]+\)|[^,]+)');
 /// Takes in a string that is basically a python function call with named arguments
 /// and converts it into a list of maps with the function name and arguments.
 /// The list handles each function call in the string in order.
-class PythonAbilityParser extends AbilityParser {
+class PythonSkillParser extends SkillParser {
   // Parse a single or multiline function call string
   @override
-  List<AbilityCall> parseFunctionCalls(String functionCall, List<Ability> abilities) {
-    final functions = <AbilityCall>[];
+  List<SkillUse> parseSkills(String functionCall, List<Skill> abilities) {
+    final functions = <SkillUse>[];
     // First, split the string into lines
     var lines = functionCall.split('\n');
     for (final line in lines) {
@@ -29,7 +29,7 @@ class PythonAbilityParser extends AbilityParser {
 
       for (final match in functionAndArgumentsRegex.allMatches(line)) {
         final arguments = _parseArguments(match.group(2)!, abilities);
-        functions.add(AbilityCall(ability: abilities.firstWhere((x) => x.functionName == match.group(1)!), arguments: arguments));
+        functions.add(SkillUse(skill: abilities.firstWhere((x) => x.name == match.group(1)!), arguments: arguments));
       }
     }
 
@@ -37,7 +37,7 @@ class PythonAbilityParser extends AbilityParser {
   }
 
   // Parse arguments of a function
-  Map<String, dynamic> _parseArguments(String argsString, List<Ability> abilities) {
+  Map<String, dynamic> _parseArguments(String argsString, List<Skill> abilities) {
     if (argsString.isEmpty) return {};
     var argsMap = <String, dynamic>{};
 
@@ -63,7 +63,7 @@ class PythonAbilityParser extends AbilityParser {
           final functionName = functionMatch.group(1)!;
           final functionArguments = functionMatch.group(2)!;
           final arguments = _parseArguments(functionArguments, abilities);
-          argsMap[key] = AbilityCall(ability: abilities.firstWhere((x) => x.functionName == functionName), arguments: arguments);
+          argsMap[key] = SkillUse(skill: abilities.firstWhere((x) => x.name == functionName), arguments: arguments);
         }
       }
     }

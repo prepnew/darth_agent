@@ -1,27 +1,34 @@
 import 'dart:io';
 
-import 'package:darth_agent/ability/basic/location_check.dart';
-import 'package:darth_agent/ability/basic/weather_check.dart';
-import 'package:darth_agent/ai_agent.dart';
+import 'package:darth_agent/input/embeddings/ollama_embeddings.dart';
+import 'package:darth_agent/memory/banks/chroma_conversation_memory.dart';
+import 'package:darth_agent/memory/simple/postgresql_db.dart';
+import 'package:darth_agent/memory/util/chroma_datastore.dart';
+import 'package:darth_agent/skills/net_dependent/location_check.dart';
+import 'package:darth_agent/skills/net_dependent/weather_check.dart';
+import 'package:darth_agent/agents/ai_agent.dart';
 import 'package:darth_agent/env.dart';
 import 'package:darth_agent/input/clients/ollama_client.dart';
-import 'package:darth_agent/input/interpreter.dart';
-import 'package:darth_agent/input/python_ability_parser.dart';
-import 'package:darth_agent/memory/long_term/archival_memory.dart';
-import 'package:darth_agent/memory/short_term/core_memory.dart';
+import 'package:darth_agent/input/context_expander.dart';
+import 'package:darth_agent/input/python_skill_parser.dart';
 import 'package:darth_agent/utils/debug_type.dart';
+import 'package:langchain_chroma/langchain_chroma.dart';
 
-const prompt = 'What is the temperature in Longyearbyen right now?';
+const prompt = 'Tell me what I like to eat on fridays'; //'What is the temperature in Oslo right now?';
 
 void main() async {
+  final ollamaClient = OllamaClient(host: 'http://localhost');
   final aiAgent = AIAgent(
-    abilities: [WeatherCheck(userAgent: Env.weatherUserAgent), LocationCheck(locationApiKey: Env.locationApiKey)],
-    coreMemory: CoreMemory(),
+    name: 'Weather Agent',
+    skills: [
+      WeatherCheck(userAgent: Env.weatherUserAgent, dataStore: PostgresqlDb()),
+      LocationCheck(locationApiKey: Env.locationApiKey, dataStore: PostgresqlDb()),
+    ],
+    memories: [ChromaConversationMemory(chromaDataStore: ChromaDataStore(chromaClient: Chroma(embeddings: OllamaEmbeddings(client: ollamaClient))))],
     subjects: [],
-    archivalMemory: ArchivalMemory(),
-    interpreter: Interpreter(
-      client: OllamaClient(host: 'http://localhost'),
-      functionParser: PythonAbilityParser(),
+    contextRetriever: ContextExpander(
+      client: ollamaClient,
+      skillParser: PythonSkillParser(),
     ),
     debug: DebugType.basic,
   );
