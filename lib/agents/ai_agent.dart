@@ -1,5 +1,7 @@
 library darth_agent;
 
+import 'dart:io';
+
 import 'package:darth_agent/input/context_expander.dart';
 import 'package:darth_agent/memory/memory_bank.dart';
 import 'package:darth_agent/utils/debug_type.dart';
@@ -53,6 +55,7 @@ class AIAgent {
       subjects: subjects,
       debug: debug,
     );
+    if (debug.index > 0) stdout.writeln('Context retrieved:\n$retrievedContext');
 
     /// Send context along with prompt to the model used for response generation
     return Future.value(AgentResponse(message: retrievedContext, tokens: 0));
@@ -69,6 +72,7 @@ class AIAgent {
       subjects: subjects,
       debug: debug,
     );
+    if (debug.index > 0) stdout.writeln('Context retrieved:\n$retrievedContext');
 
     /// Send context along with prompt to the model used for response generation
 
