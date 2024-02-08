@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:darth_agent/memory/simple/postgresql_db.dart';
+import 'package:darth_agent/skills/net_dependent/information_finder.dart';
 import 'package:darth_agent/skills/net_dependent/location_check.dart';
 import 'package:darth_agent/skills/net_dependent/weather_check.dart';
 import 'package:darth_agent/agents/ai_agent.dart';
@@ -21,26 +22,35 @@ const prompt = 'What is the temperature in Oslo right now?';
 
 void main() async {
   final ollamaClient = OllamaClient(host: 'http://localhost');
+  final debug = DebugType.basic;
   final aiAgent = AIAgent(
     name: 'Weather Agent',
+    model: 'mistral',
     skills: [
-      WeatherCheck(userAgent: Env.weatherUserAgent, dataStore: PostgresqlDb()),
-      LocationCheck(locationApiKey: Env.locationApiKey, dataStore: PostgresqlDb()),
+      /*WeatherCheck(userAgent: Env.weatherUserAgent, dataStore: PostgresqlDb()),
+      LocationCheck(
+        locationApiKey: Env.locationApiKey,
+        dataStore: PostgresqlDb(),
+      ),*/
+      InformationFinder(),
     ],
+    client: ollamaClient,
     memories: [
       ChromaConversationMemory(
           chromaDataStore: ChromaDataStore(
               chromaClient: Chroma(
-        embeddings: OllamaEmbeddings(client: ollamaClient),
+        embeddings: OllamaEmbeddings(model: 'mistral', client: ollamaClient),
       )))
     ],
     contextRetriever: ContextExpander(
       client: ollamaClient,
       skillParser: PythonSkillParser(),
     ),
-    debug: DebugType.none,
+    debug: debug,
   );
 
+  if (debug.index == 0)
+    stdout.writeln('Requesting response with prompt:\n$prompt');
   final response = await aiAgent.requestResponse(prompt: prompt);
   stdout.writeln(response.message);
 

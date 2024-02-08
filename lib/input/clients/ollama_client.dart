@@ -18,39 +18,55 @@ class OllamaClient extends InputClient {
 
   @override
   Future<ClientResult> generateResult({
+    required String model,
     required String prompt,
+    Map<String, dynamic> options = const {},
+    Map<String, dynamic>? headers = null,
+    String? template = null,
+    String? systemPrompt = null,
   }) async {
     final result = await ollama.generateResult(
       prompt: prompt,
-      model: model!,
+      model: model,
       systemPrompt: systemPrompt,
       template: template,
       options: options,
     );
-    return result.toClientResult(model!);
+    return result.toClientResult(model);
+  }
+
+  @override
+  Future<List<double>> generateEmbeddings({
+    required String model,
+    required String prompt,
+    Map<String, dynamic> options = const {},
+    Map<String, dynamic>? headers = null,
+    String? template = null,
+    String? systemPrompt = null,
+  }) async {
+    final ollamaEmdeddings = await ollama.generateEmbeddings(
+      model,
+      prompt,
+      options: null, // TODO: Options not implemented?
+    );
+    return ollamaEmdeddings.embeddings;
   }
 
   @override
   Future<Stream<ClientChunkResult>> streamResult({
+    required String model,
     required String prompt,
+    Map<String, dynamic> options = const {},
+    Map<String, dynamic>? headers = null,
+    String? template = null,
+    String? systemPrompt = null,
   }) async {
     final stream = await ollama.generateStream(
       prompt: prompt,
-      model: model!,
+      model: model,
       systemPrompt: systemPrompt,
     );
-    return stream.map((chunk) => chunk.toClientChunkResult(model!));
-  }
-
-  @override
-  Future<List<double>> generateEmbeddings({required String prompt}) async {
-    // TODO: Add options properly
-    final ollamaEmdeddings = await ollama.generateEmbeddings(
-      model!,
-      prompt,
-      options: null,
-    );
-    return ollamaEmdeddings.embeddings;
+    return stream.map((chunk) => chunk.toClientChunkResult(model));
   }
 }
 

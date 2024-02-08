@@ -1,6 +1,6 @@
 # Darth Agent
 
-[![Darth Agent](darth_agent_logo.png)](dart_agent.png)
+[![Darth Agent](darth_agent_logo.png)](darth_agent.png)
 
 ## Introduction
 `darth_agent` is a versatile Dart package designed for seamless integration into Dart or Flutter projects, be it on the backend, web or in mobile applications. This package serves as a foundation for building AI agents, leveraging model interfaces like Ollama and ChatGPT. Developers can customize and extend these agents with specific abilities, personalities, and memory functionalities tailored to their project's needs.

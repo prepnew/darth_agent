@@ -29,7 +29,8 @@ class ContextExpander {
       double temperature = 0.001}) async {
     final context = <String>[];
     final time = DateTime.now().millisecondsSinceEpoch;
-    if (debug.index > 0) stdout.writeln('User request for context expanding: $prompt');
+    if (debug.index > 0)
+      stdout.writeln('User request for context expanding: $prompt');
     // TODO: Template is specific for nexusraven. Need a similar template for ChatGPT
     final template = '''{{ .System }}\nUser Query: {{ .Prompt }}<human_end>''';
     // TODO: Fallback function is not model agnostic and bound to PythonParser for NexusRaven. Need a similar function for ChatGPT
@@ -51,19 +52,25 @@ class ContextExpander {
     if (debug != DebugType.verbose) {
       options['stop'] = ['Thought:'];
     }
-    client.setupGeneration(
+
+    /// Start by generating context from function calls. If no function calls
+    /// then move on to memories and subjects
+    final functionResult = await client.generateResult(
       model: 'nexusraven',
+      prompt: prompt,
       systemPrompt: systemPrompt,
       template: template,
       options: options,
     );
-
-    /// Start by generating context from function calls. If no function calls
-    /// then move on to memories and subjects
-    final functionResult = await client.generateResult(prompt: prompt);
     final response = functionResult.choices.first.message.content;
     stdout.writeln('Function call result: $response');
-    final skillCheck = response.substring(response.indexOf('Call: ') + 6, debug == DebugType.verbose ? response.indexOf('Thought:') : response.length).trim();
+    final skillCheck = response
+        .substring(
+            response.indexOf('Call: ') + 6,
+            debug == DebugType.verbose
+                ? response.indexOf('Thought:')
+                : response.length)
+        .trim();
     if (debug.index > 0)
       stdout.writeln(
           'Skill check:${debug == DebugType.verbose ? response : skillCheck}\nSkill used ${DateTime.now().millisecondsSinceEpoch - time} milliseconds to complete');
@@ -81,16 +88,17 @@ class ContextExpander {
       for (final neurolink in memoryBank.memoryInteractors) {
         systemPrompt += neurolink.description;
       }
-      if (debug.index > 1) stdout.writeln('Memory system prompt: $systemPrompt');
-      client.setupGeneration(
+      if (debug.index > 1)
+        stdout.writeln('Memory system prompt: $systemPrompt');
+
+      /// Memory interaction decided
+      final memoryResult = await client.generateResult(
         model: 'nexusraven',
+        prompt: prompt,
         systemPrompt: systemPrompt,
         template: template,
         options: options,
       );
-
-      /// Memory interaction decided
-      final memoryResult = await client.generateResult(prompt: prompt);
       final memoryResponse = memoryResult.choices.first.message.content;
       stdout.writeln('Memory function: $memoryResponse');
       // TODO: Rework skill parser to also work for memories? Or a separate one?

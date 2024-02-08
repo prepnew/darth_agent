@@ -4,7 +4,7 @@ import 'package:darth_agent/input/clients/input_client.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 
 /// Uses llama.cpp through llama_cpp_dart to generate results
-abstract class DirectClient extends InputClient {
+class DirectClient extends InputClient {
   DirectClient({
     required String modelPath,
     required this.contextParams,
@@ -20,13 +20,12 @@ abstract class DirectClient extends InputClient {
   Llama? llama;
   LlamaProcessor? processor;
 
-  @override
-  Future<void> preloadModel({String? model, String? modelPath}) async {
+  Future<void> preloadModel({required String modelPath}) async {
     if (isBackend) {
-      llama = Llama(modelPath!, modelParams, contextParams, samplingParams);
+      llama = Llama(modelPath, modelParams, contextParams, samplingParams);
     } else {
       processor = LlamaProcessor(
-        modelPath!,
+        modelPath,
         modelParams,
         contextParams,
         samplingParams,
@@ -34,17 +33,45 @@ abstract class DirectClient extends InputClient {
     }
   }
 
+  void dispose() {
+    llama?.clear();
+    llama?.dispose();
+    processor?.stop();
+    processor?.unloadModel();
+  }
+
   @override
-  Future<ClientResult> generateResult({
-    required String prompt,
-  }) {
+  Future<List<double>> generateEmbeddings(
+      {required String model,
+      required String prompt,
+      Map<String, dynamic> options = const {},
+      Map<String, dynamic>? headers = null,
+      String? template = null,
+      String? systemPrompt = null}) {
+    // TODO: implement generateEmbeddings
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ClientResult> generateResult(
+      {required String model,
+      required String prompt,
+      Map<String, dynamic> options = const {},
+      Map<String, dynamic>? headers = null,
+      String? template = null,
+      String? systemPrompt = null}) {
     // TODO: implement generateResult
     throw UnimplementedError();
   }
 
   @override
   Future<Stream<ClientChunkResult>> streamResult({
+    required String model,
     required String prompt,
+    Map<String, dynamic> options = const {},
+    Map<String, dynamic>? headers = null,
+    String? template = null,
+    String? systemPrompt = null,
   }) async {
     if (isBackend) {
       llama!.clear();
@@ -55,13 +82,5 @@ abstract class DirectClient extends InputClient {
       processor!.prompt(prompt);
       return processor!.stream.map((event) => ClientChunkResult());
     }
-  }
-
-  @override
-  void dispose() {
-    llama?.clear();
-    llama?.dispose();
-    processor?.stop();
-    processor?.unloadModel();
   }
 }
